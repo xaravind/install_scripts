@@ -16,11 +16,11 @@ sudo yum update -y
 echo "[INFO] Installing unzip..."
 sudo yum install -y unzip
 
-# Install OpenJDK 17
-echo "[INFO] Installing OpenJDK 17..."
-sudo yum install -y java-17-openjdk
+# Install Amazon Corretto 17 JDK
+echo "[INFO] Installing Amazon Corretto 17 JDK..."
+sudo yum install -y java-17-amazon-corretto-devel.x86_64
 
-# Create sonar user (optional best practice)
+# Create sonar user
 echo "[INFO] Creating sonar user..."
 sudo useradd -m sonar || echo "[INFO] User already exists."
 
