@@ -3,49 +3,57 @@
 LOGFILE="/var/log/setup_sonarqube.log"
 exec > >(tee -a "$LOGFILE") 2>&1
 
-# Uncomment to stop script on any error
+# Stop on any error
 set -e
 
 echo "========== Script started at $(date) =========="
 
 # Update system
 echo "[INFO] Updating system..."
-sudo apt update -y
+sudo yum update -y
 
-# Install unzip if not present
+# Install unzip
 echo "[INFO] Installing unzip..."
-sudo apt install -y unzip
+sudo yum install -y unzip
 
-# Install OpenJDK 17 (required for SonarQube)
+# Install OpenJDK 17
 echo "[INFO] Installing OpenJDK 17..."
-sudo apt install openjdk-17-jre-headless -y
+sudo yum install -y java-17-openjdk
+
+# Create sonar user (optional best practice)
+echo "[INFO] Creating sonar user..."
+sudo useradd -m sonar || echo "[INFO] User already exists."
+
+# Switch to /opt directory
+cd /opt
 
 # Download SonarQube
 echo "[INFO] Downloading SonarQube..."
 wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-25.4.0.105899.zip
 
-# Check if SonarQube download was successful
+# Verify download
 if [ ! -f sonarqube-25.4.0.105899.zip ]; then
     echo "[ERROR] SonarQube download failed!"
     exit 1
 fi
 
-# Unzip SonarQube
+# Extract SonarQube
 echo "[INFO] Extracting SonarQube..."
-unzip sonarqube-25.4.0.105899.zip
-
-# Change to SonarQube directory
-cd sonarqube-25.4.0.105899/bin/linux-x86-64
+sudo unzip sonarqube-25.4.0.105899.zip
+sudo mv sonarqube-25.4.0.105899 sonarqube
+sudo chown -R sonar:sonar /opt/sonarqube
+sudo rm -f sonarqube-25.4.0.105899.zip
 
 # Start SonarQube
 echo "[INFO] Starting SonarQube..."
-./sonar.sh start
+cd /opt/sonarqube/bin/linux-x86-64
+sudo -u sonar ./sonar.sh start
 
-# Check if SonarQube started successfully
+# Check SonarQube status
 echo "[INFO] Checking SonarQube status..."
-./sonar.sh status
+sudo -u sonar ./sonar.sh status
 
-# Verify if SonarQube is running
+# Verify process
 if ps aux | grep -v grep | grep sonar > /dev/null; then
     echo "[SUCCESS] SonarQube started successfully!"
 else
