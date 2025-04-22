@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Auto-elevate to root if not already
+if [[ $EUID -ne 0 ]]; then
+    echo "[INFO] Re-running script as root..."
+    exec sudo "$0" "$@"
+fi
+
+
+
 LOGFILE="/var/log/setup_jenkins_maven.log"
 exec > >(tee -a "$LOGFILE") 2>&1
 
