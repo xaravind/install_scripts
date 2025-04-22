@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/var/log/setup_jenkins_tomcat.log"
+LOGFILE="/var/log/setup_jenkins_maven.log"
 exec > >(tee -a "$LOGFILE") 2>&1
 
 # Uncomment to stop script on any error
